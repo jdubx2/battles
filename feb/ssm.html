@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<script src = 'jquery1_9.min.js'></script>
+<script src="d3.v4.min.js"></script>
+<!-- <script src="jquery-3.3.1.min.js"></script> -->
+<script src="d3_tip.js"></script>
 <style type="text/css">
 
 /* Legend Font Style */
+*{	font-family: 'Open Sans','droid_sansregular', sans-serif;}
+
 body {
-	font: 11px sans-serif;
 	background-color: #F5F5F5;
 }
 
@@ -28,11 +30,113 @@ body {
 	stroke: #000;
 	shape-rendering: crispEdges;
 }
+#title{
+	position: fixed;
+	 top: 10px; /* or whatever top you need */
+	 left: 50%;
+	 width: auto;
+	 -webkit-transform: translateX(-50%);
+	 -moz-transform: translateX(-50%);
+	 -ms-transform: translateX(-50%);
+	 -o-transform: translateX(-50%);
+	 transform: translateX(-50%);
+	text-align: center;
+	line-height: .85;
+	font-size: 30px;
+}
+#year_svg{
+	position: fixed;
+	 top: 64px; /* or whatever top you need */
+	 left: 50%;
+	 width: auto;
+	 -webkit-transform: translateX(-50%);
+	 -moz-transform: translateX(-50%);
+	 -ms-transform: translateX(-50%);
+	 -o-transform: translateX(-50%);
+	 transform: translateX(-50%);
+}
+#circles_svg{
+	position: fixed;
+	 top: 110px; /* or whatever top you need */
+	 left: 50%;
+	 width: auto;
+	 -webkit-transform: translateX(-50%);
+	 -moz-transform: translateX(-50%);
+	 -ms-transform: translateX(-50%);
+	 -o-transform: translateX(-50%);
+	 transform: translateX(-50%);
+}
+#map_svg{
+	position: fixed;
+	 top: 220px; /* or whatever top you need */
+	 left: 50%;
+	 width: auto;
+	 -webkit-transform: translateX(-50%);
+	 -moz-transform: translateX(-50%);
+	 -ms-transform: translateX(-50%);
+	 -o-transform: translateX(-50%);
+	 transform: translateX(-50%);
+}
+
+
+#year_header{
+	fill: black;
+	stroke: #F5F5F5;
+	stroke-width: .35px;
+	font-size: 31px;
+	font-weight: bold;
+	font-family: 'Open Sans','droid_sansregular', sans-serif;
+}
+
+.d3-tip {
+    line-height: 1;
+    padding: 6px;
+    background: rgba(9,15,15,.6);
+    color: #fff;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+ /*Creates a small triangle extender for the tooltip*/
+    /* .d3-tip:after {
+    box-sizing: border-box;
+    display: inline;
+    font-size: 10px;
+    width: 100%;
+    line-height: 1;
+    color: rgba(9,15,15,.6);
+    content: "\25BC";
+    position: absolute;
+    text-align: center;
+  } */
+
+  /* Style northward tooltips specifically */
+   .d3-tip.n:after {
+    margin: -2px 0 0 0;
+    top: 100%;
+    left: 0;
+}
+.prop_text{
+	fill: black;
+	stroke: #F5F5F5;
+	stroke-width: .6px;
+	font-size: 24px;
+	opacity: .9;
+	font-family: 'Open Sans','droid_sansregular', sans-serif;
+}
 
 </style>
 </head>
 <body>
+	<div id = 'title'>Same-sex Marriage in the United States<br /><small><small>1995-2015</small></small></div>
+	<div id = 'year_svg'></div>
+	<div id = 'circles_svg'></div>
+	<div id = 'map_svg'></div>
+
 <script type="text/javascript">
+
+var shares = [{"status":"Constitutional Ban","lpos":3,"X1995":0,"X1996":0,"X1997":0,"X1998":0.02,"X1999":0.02,"X2000":0.04,"X2001":0.04,"X2002":0.06,"X2003":0.06,"X2004":0.32,"X2005":0.36,"X2006":0.52,"X2007":0.52,"X2008":0.58,"X2009":0.58,"X2010":0.58,"X2011":0.58,"X2012":0.6,"X2013":0.58,"X2014":0.3,"X2015":0},{"status":"Legal","lpos":4,"X1995":0,"X1996":0,"X1997":0,"X1998":0,"X1999":0,"X2000":0,"X2001":0,"X2002":0,"X2003":0.02,"X2004":0.02,"X2005":0.02,"X2006":0.02,"X2007":0.02,"X2008":0.04,"X2009":0.1,"X2010":0.1,"X2011":0.12,"X2012":0.18,"X2013":0.34,"X2014":0.7,"X2015":1},{"status":"No Law","lpos":1,"X1995":0.74,"X1996":0.48,"X1997":0.34,"X1998":0.22,"X1999":0.24,"X2000":0.18,"X2001":0.18,"X2002":0.16,"X2003":0.14,"X2004":0.1,"X2005":0.1,"X2006":0.1,"X2007":0.1,"X2008":0.1,"X2009":0.08,"X2010":0.08,"X2011":0.06,"X2012":0.06,"X2013":0,"X2014":0,"X2015":0},{"status":"Statutory Ban","lpos":2,"X1995":0.26,"X1996":0.52,"X1997":0.66,"X1998":0.76,"X1999":0.74,"X2000":0.78,"X2001":0.78,"X2002":0.78,"X2003":0.78,"X2004":0.56,"X2005":0.52,"X2006":0.36,"X2007":0.36,"X2008":0.28,"X2009":0.24,"X2010":0.24,"X2011":0.24,"X2012":0.16,"X2013":0.08,"X2014":0,"X2015":0}]
+
 
 function unique(array) {
     return $.grep(array, function(el, index) {
@@ -40,16 +144,84 @@ function unique(array) {
     });
 }
 
+var margin = {top: 70, right:100, bottom: 20, left: 100};
+
+var circles_width = 700;
+var circles_height = 150;
+
+var circles_svg = d3.select('#circles_svg')
+  .append('svg')
+	.attr('id', 'csvg')
+	.attr('height', circles_height)
+	.attr('width', circles_width)
+	.append('g')
+	.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+var circles_axis = d3.scaleLinear()
+  .domain([1,4])
+	.range([0,circles_width - margin.left - margin.right]);
+
+var circles_size = d3.scaleLinear()
+	.domain([0,1])
+	.range([0,60]);
+
+var levels = ['Constitutional Ban', 'Statutory Ban', 'No Law', 'Legal']
+var pal = d3.scaleOrdinal().domain(levels).range(['#b2182b','#de7f70','#A9A9A9','#2166ac'])
+
+var circles = circles_svg.selectAll("prop_circles")
+	.data(shares).enter()
+	.append("circle")
+		.attr('class', 'prop_circles')
+		.attr('cx', function(d) { return circles_axis(d.lpos);})
+		.attr('cy', 20)
+		.attr('r', function(d) {return circles_size(d.X1995);})
+		.attr("fill", function(d){return pal(d.status)});
+
+var circle_text = circles_svg.selectAll("prop_text")
+	.data(shares).enter()
+	.append("text")
+		.attr('class', 'prop_text')
+		.attr("x", function(d) { return circles_axis(d.lpos) + 3;})
+		.attr("y", 27)
+		.attr('text-anchor', 'middle')
+		.text(function(d) {return '' + Math.round(d.X1995 * 100) + '%';});
+
+d3.select('#csvg').append('g')
+	.attr('transform', 'translate(' + margin.left + ',' + 0 + ')')
+	.selectAll("legend_text")
+	.data(['No Law', 'Statutory Ban', 'Constitutional Ban', 'Legal']).enter()
+	.append('text')
+		.attr('class', 'legend_text')
+		.attr("x", function(d,i) {return circles_axis(i+1) - 4;})
+		.attr("y", 11.5)
+		.attr('font-size', 13.5)
+		.attr('font-weight', 'bold')
+		.attr('fill', 'black')
+		.attr('text-anchor', 'middle')
+		.text(function(d) {return d;});
+
+d3.select('#csvg').append('g')
+	.attr('transform', 'translate(' + margin.left + ',' + 13 + ')')
+	.selectAll("legend_bars")
+	.data(['No Law', 'Statutory Ban', 'Constitutional Ban', 'Legal']).enter()
+	.append('rect')
+		.attr('class', 'legend_rect')
+		.attr("x", function(d,i) {return circles_axis(i+1) - 62;})
+		.attr("y", 5)
+		.attr("width", 120)
+		.attr('height', 6)
+		.attr('fill', function(d) {return pal(d)});
+
+
 //Width and height of map
+// var width = $(window).width() * .75 - margin.left - margin.right;
+// var height = $(window).height() * .75 - margin.top - margin.bottom;
 var width = 960;
 var height = 500;
 
-// var lowColor = '#f9f9f9'
-// var highColor = '#bc2a66'
-
 // D3 Projection
 var projection = d3.geoAlbersUsa()
-  .translate([width / 2, height / 2]) // translate to center of screen
+  // .translate([$(window).width()/2, $(window).height()/2]) // translate to center of screen
   .scale([1000]); // scale things down so see entire US
 
 // Define path generator
@@ -57,10 +229,16 @@ var path = d3.geoPath() // path generator that will convert GeoJSON to SVG paths
   .projection(projection); // tell path generator to use albersUsa projection
 
 //Create SVG element and append map to the SVG
-var svg = d3.select("body")
+var svg = d3.select("#map_svg")
   .append("svg")
   .attr("width", width)
   .attr("height", height);
+
+var year_svg = d3.select("#year_svg")
+	.append("svg")
+	.attr("width", 200)
+	.attr("height", 60)
+	.append("g")
 
 // Load in my states data!
 d3.csv("ssm.csv", function(data) {
@@ -69,9 +247,6 @@ d3.csv("ssm.csv", function(data) {
   //   console.log(data[d].X2005);
 	// 	dataArray.push(parseFloat(data[d].X2005))
 	// }
-
-  var levels = ['Constitutional Ban', 'Statutory Ban', 'No Law', 'Legal']
-	var pal = d3.scaleOrdinal().domain(levels).range(['#ca0020','#f4a582','#A9A9A9','#0571b0'])
 
   // Load GeoJSON data and merge with states data
   d3.json("us-states.json", function(json) {
@@ -106,6 +281,7 @@ d3.csv("ssm.csv", function(data) {
       X2013 = data[i].X2013;
       X2014 = data[i].X2014;
       X2015 = data[i].X2015;
+			abbrev = data[i].abbrev;
 
 
 
@@ -137,6 +313,7 @@ d3.csv("ssm.csv", function(data) {
           json.features[j].properties.X2013 = X2013;
           json.features[j].properties.X2014 = X2014;
           json.features[j].properties.X2015 = X2015;
+					json.features[j].properties.abbrev = abbrev;
 
           // Stop looking through the JSON
           break;
@@ -144,11 +321,20 @@ d3.csv("ssm.csv", function(data) {
       }
     }
 
-    var trans_timer = 800;
+		var tool_tip = d3.tip()
+			.attr("class", "d3-tip")
+			.offset([50, -480])
+			.html(function(d,i) { return d; });
+
+		svg.call(tool_tip);
+
+    var trans_timer = 1250;
     var trans_ease = d3.easeSin;
+		var text_opac = .65;
+		var text_opac2 = .9;
 
     // Bind the data to the SVG and create one path per GeoJSON feature
-    svg.selectAll("path")
+    var state_paths = svg.selectAll("path")
       .data(json.features)
       .enter()
       .append("path")
@@ -156,10 +342,24 @@ d3.csv("ssm.csv", function(data) {
       .attr("class","state_paths")
       .style("stroke", "#fff")
       .style("stroke-width", "1")
-      .style("fill", function(d) { return pal(d.properties.X1995)})
-          .transition()
+			.style("fill", function(d) { return pal(d.properties.X1995)})
+			.on('mouseover', function(d,i) {
+				tool_tip.show(d.properties.abbrev);})
+			.on('mouseout', function(d,i) {
+				tool_tip.hide(d.properties.abbrev);});
+
+		year_svg.append("text")
+			.attr("id", "year_header")
+			.attr("x", 100)
+			.attr("y", 30)
+			.attr('text-anchor', 'middle')
+			.text("1995");
+
+		function repeat(){
+			state_paths.transition()
           .duration(trans_timer)
           .ease(trans_ease)
+					.delay(3000)
           .style("fill", function(d) { return pal(d.properties.X1996)})
           .transition()
           .duration(trans_timer)
@@ -200,6 +400,10 @@ d3.csv("ssm.csv", function(data) {
           .transition()
           .ease(trans_ease)
           .duration(trans_timer)
+					.style("fill", function(d) { return pal(d.properties.X2006)})
+					.transition()
+					.ease(trans_ease)
+					.duration(trans_timer)
           .style("fill", function(d) { return pal(d.properties.X2007)})
           .transition()
           .ease(trans_ease)
@@ -232,72 +436,489 @@ d3.csv("ssm.csv", function(data) {
           .transition()
           .ease(trans_ease)
           .duration(trans_timer)
-          .style("fill", function(d) { return pal(d.properties.X2015)});
+          .style("fill", function(d) { return pal(d.properties.X2015)})
+					.transition()
+					.ease(trans_ease)
+					.duration(trans_timer)
+					.delay(3000)
+					.style("fill", function(d) { return pal(d.properties.X1995)});
 
-    //   var year_list = Object.keys(json.features[0].properties).slice(2,25);
-    //
-    //   var i = 0;
-    //
-    // // function repeat(){
-    // //   if(i < year_list.length){
-    //     svg.selectAll(".state_paths")
-    //       .transition()
-    //       .duration(1500)
-    //       .style("fill", function(d) {return pal(d.properties[year_list[i]]);})
-    //       .on("end", function() {i+=1; if(i < year_list.length){console.log(i);};});
-    // //   }
-    // // }
-    // // repeat();
+					circles.transition()
+						.ease(trans_ease)
+	          .duration(trans_timer)
+						.delay(3000)
+	          .attr('r', function(d) {return circles_size(d.X1996);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X1997);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X1998);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X1999);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X2000);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X2001);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X2002);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X2003);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X2004);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X2005);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X2006);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X2007);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X2008);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X2009);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X2010);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X2011);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X2012);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X2013);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X2014);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.attr('r', function(d) {return circles_size(d.X2015);})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer)
+						.delay(3000)
+						.attr('r', function(d) {return circles_size(d.X1995);});
+
+					circle_text.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.delay(3000)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X1996 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X1997 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X1998 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X1999 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X2000 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X2001 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X2002 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X2003 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X2004 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X2005 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X2006 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X2007 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X2008 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X2009 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X2010 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X2011 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X2012 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X2013 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X2014 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X2015 * 100) + '%';})
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.delay(3000)
+						.style("opacity", text_opac2)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", .9)
+						.text(function(d) {return '' + Math.round(d.X1995 * 100) + '%';});
 
 
+					d3.select('#year_header')
+						.transition()
+	          .ease(trans_ease)
+	          .duration(trans_timer/2)
+						.delay(3000)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("1996")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("1997")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("1998")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("1999")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("2000")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("2001")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("2002")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("2003")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("2004")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("2005")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("2006")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("2007")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("2008")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("2009")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("2010")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("2011")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("2012")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("2013")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("2014")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("2015")
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.delay(3000)
+						.style("opacity", text_opac)
+						.transition()
+						.ease(trans_ease)
+						.duration(trans_timer/2)
+						.style("opacity", 1)
+						.text("1995")
+						// .on("end", repeat);
+				};
+				repeat();
 
-
-
-
-		// // add a legend
-		// var w = 140, h = 300;
-    //
-		// var key = d3.select("body")
-		// 	.append("svg")
-		// 	.attr("width", w)
-		// 	.attr("height", h)
-		// 	.attr("class", "legend");
-    //
-		// var legend = key.append("defs")
-		// 	.append("svg:linearGradient")
-		// 	.attr("id", "gradient")
-		// 	.attr("x1", "100%")
-		// 	.attr("y1", "0%")
-		// 	.attr("x2", "100%")
-		// 	.attr("y2", "100%")
-		// 	.attr("spreadMethod", "pad");
-    //
-		// legend.append("stop")
-		// 	.attr("offset", "0%")
-		// 	.attr("stop-color", highColor)
-		// 	.attr("stop-opacity", 1);
-    //
-		// legend.append("stop")
-		// 	.attr("offset", "100%")
-		// 	.attr("stop-color", lowColor)
-		// 	.attr("stop-opacity", 1);
-    //
-		// key.append("rect")
-		// 	.attr("width", w - 100)
-		// 	.attr("height", h)
-		// 	.style("fill", "url(#gradient)")
-		// 	.attr("transform", "translate(0,10)");
-    //
-		// var y = d3.scaleLinear()
-		// 	.range([h, 0])
-		// 	.domain([minVal, maxVal]);
-    //
-		// var yAxis = d3.axisRight(y);
-    //
-		// key.append("g")
-		// 	.attr("class", "y axis")
-		// 	.attr("transform", "translate(41,10)")
-		// 	.call(yAxis)
   });
 });
 </script>
