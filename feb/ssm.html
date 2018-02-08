@@ -100,6 +100,13 @@ d3.csv("ssm.csv", function(data) {
       X2007 = data[i].X2007,
       X2008 = data[i].X2008,
       X2009 = data[i].X2009;
+      X2010 = data[i].X2010;
+      X2011 = data[i].X2011;
+      X2012 = data[i].X2012;
+      X2013 = data[i].X2013;
+      X2014 = data[i].X2014;
+      X2015 = data[i].X2015;
+
 
 
       // Find the corresponding state inside the GeoJSON
@@ -124,12 +131,21 @@ d3.csv("ssm.csv", function(data) {
           json.features[j].properties.X2007 = X2007;
           json.features[j].properties.X2008 = X2008;
           json.features[j].properties.X2009 = X2009;
+          json.features[j].properties.X2010 = X2010;
+          json.features[j].properties.X2011 = X2011;
+          json.features[j].properties.X2012 = X2012;
+          json.features[j].properties.X2013 = X2013;
+          json.features[j].properties.X2014 = X2014;
+          json.features[j].properties.X2015 = X2015;
 
           // Stop looking through the JSON
           break;
         }
       }
     }
+
+    var trans_timer = 800;
+    var trans_ease = d3.easeSin;
 
     // Bind the data to the SVG and create one path per GeoJSON feature
     svg.selectAll("path")
@@ -140,39 +156,100 @@ d3.csv("ssm.csv", function(data) {
       .attr("class","state_paths")
       .style("stroke", "#fff")
       .style("stroke-width", "1")
-      .style("fill", function(d) { return pal(d.properties.X1995)});
-
-      var year_list = Object.keys(json.features[0].properties).slice(2,25);
-
-      var i = 0;
-
-    // function repeat(){
-    //   if(i < year_list.length){
-        svg.selectAll(".state_paths")
+      .style("fill", function(d) { return pal(d.properties.X1995)})
           .transition()
-          .duration(1500)
-          .style("fill", function(d) {return pal(d.properties[year_list[i]]);})
-          .on("end", function() {i+=1; if(i < year_list.length){console.log(i);};});
-    //   }
-    // }
-    // repeat();
+          .duration(trans_timer)
+          .ease(trans_ease)
+          .style("fill", function(d) { return pal(d.properties.X1996)})
+          .transition()
+          .duration(trans_timer)
+          .ease(trans_ease)
+          .style("fill", function(d) { return pal(d.properties.X1997)})
+          .transition()
+          .duration(trans_timer)
+          .ease(trans_ease)
+          .style("fill", function(d) { return pal(d.properties.X1998)})
+          .transition()
+          .ease(trans_ease)
+          .duration(trans_timer)
+          .style("fill", function(d) { return pal(d.properties.X1999)})
+          .transition()
+          .ease(trans_ease)
+          .duration(trans_timer)
+          .style("fill", function(d) { return pal(d.properties.X2000)})
+          .transition()
+          .ease(trans_ease)
+          .duration(trans_timer)
+          .style("fill", function(d) { return pal(d.properties.X2001)})
+          .transition()
+          .ease(trans_ease)
+          .duration(trans_timer)
+          .style("fill", function(d) { return pal(d.properties.X2002)})
+          .transition()
+          .ease(trans_ease)
+          .duration(trans_timer)
+          .style("fill", function(d) { return pal(d.properties.X2003)})
+          .transition()
+          .ease(trans_ease)
+          .duration(trans_timer)
+          .style("fill", function(d) { return pal(d.properties.X2004)})
+          .transition()
+          .ease(trans_ease)
+          .duration(trans_timer)
+          .style("fill", function(d) { return pal(d.properties.X2005)})
+          .transition()
+          .ease(trans_ease)
+          .duration(trans_timer)
+          .style("fill", function(d) { return pal(d.properties.X2007)})
+          .transition()
+          .ease(trans_ease)
+          .duration(trans_timer)
+          .style("fill", function(d) { return pal(d.properties.X2008)})
+          .transition()
+          .ease(trans_ease)
+          .duration(trans_timer)
+          .style("fill", function(d) { return pal(d.properties.X2009)})
+          .transition()
+          .ease(trans_ease)
+          .duration(trans_timer)
+          .style("fill", function(d) { return pal(d.properties.X2010)})
+          .transition()
+          .ease(trans_ease)
+          .duration(trans_timer)
+          .style("fill", function(d) { return pal(d.properties.X2011)})
+          .transition()
+          .ease(trans_ease)
+          .duration(trans_timer)
+          .style("fill", function(d) { return pal(d.properties.X2012)})
+          .transition()
+          .ease(trans_ease)
+          .duration(trans_timer)
+          .style("fill", function(d) { return pal(d.properties.X2013)})
+          .transition()
+          .ease(trans_ease)
+          .duration(trans_timer)
+          .style("fill", function(d) { return pal(d.properties.X2014)})
+          .transition()
+          .ease(trans_ease)
+          .duration(trans_timer)
+          .style("fill", function(d) { return pal(d.properties.X2015)});
 
-    // svg.selectAll(".state_paths")
-    //     .transition()
-    //     .duration(1500)
-    //     .style("fill", function(d) { return pal(d.properties.X1996)})
-    //     .transition()
-    //     .duration(1500)
-    //     .style("fill", function(d) { return pal(d.properties.X1997)})
-    //     .transition()
-    //     .duration(1500)
-    //     .style("fill", function(d) { return pal(d.properties.X1998)})
-    //     .transition()
-    //     .duration(1500)
-    //     .style("fill", function(d) { return pal(d.properties.X1999)})
-    //     .transition()
-    //     .duration(1500)
-    //     .style("fill", function(d) {console.log(Object.keys(d.properties)); return pal(d.properties.X2000)});
+    //   var year_list = Object.keys(json.features[0].properties).slice(2,25);
+    //
+    //   var i = 0;
+    //
+    // // function repeat(){
+    // //   if(i < year_list.length){
+    //     svg.selectAll(".state_paths")
+    //       .transition()
+    //       .duration(1500)
+    //       .style("fill", function(d) {return pal(d.properties[year_list[i]]);})
+    //       .on("end", function() {i+=1; if(i < year_list.length){console.log(i);};});
+    // //   }
+    // // }
+    // // repeat();
+
+
 
 
 
