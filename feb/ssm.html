@@ -4,7 +4,16 @@
 <meta charset="utf-8">
 <script src="d3.v4.min.js"></script>
 <!-- <script src="jquery-3.3.1.min.js"></script> -->
-<script src="d3_tip.js"></script>
+<!-- <script src="d3_tip.js"></script> -->
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src='https://www.googletagmanager.com/gtag/js?id=UA-92041039-2'></script>
+<script>
+ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
+
+ gtag('config', 'UA-92041039-2');
+</script>
 <style type="text/css">
 
 /* Legend Font Style */
@@ -41,12 +50,17 @@ body {
 	 -o-transform: translateX(-50%);
 	 transform: translateX(-50%);
 	text-align: center;
-	line-height: .85;
-	font-size: 30px;
+	line-height: .63;
+	font-size: 41px;
+  white-space:nowrap;
+  float:left;
+}
+#smaller{
+  font-size:20px !important;
 }
 #year_svg{
 	position: fixed;
-	 top: 64px; /* or whatever top you need */
+	 top: 82px; /* or whatever top you need */
 	 left: 50%;
 	 width: auto;
 	 -webkit-transform: translateX(-50%);
@@ -57,7 +71,7 @@ body {
 }
 #circles_svg{
 	position: fixed;
-	 top: 110px; /* or whatever top you need */
+	 top: 130px; /* or whatever top you need */
 	 left: 50%;
 	 width: auto;
 	 -webkit-transform: translateX(-50%);
@@ -68,7 +82,7 @@ body {
 }
 #map_svg{
 	position: fixed;
-	 top: 220px; /* or whatever top you need */
+	 top: 240px; /* or whatever top you need */
 	 left: 50%;
 	 width: auto;
 	 -webkit-transform: translateX(-50%);
@@ -82,20 +96,20 @@ body {
 #year_header{
 	fill: black;
 	stroke: #F5F5F5;
-	stroke-width: .35px;
-	font-size: 31px;
+	stroke-width: .4px;
+	font-size: 42px;
 	font-weight: bold;
 	font-family: 'Open Sans','droid_sansregular', sans-serif;
 }
 
-.d3-tip {
+/* .d3-tip {
     line-height: 1;
     padding: 6px;
     background: rgba(9,15,15,.6);
     color: #fff;
     border-radius: 4px;
     font-size: 12px;
-  }
+  } */
 
  /*Creates a small triangle extender for the tooltip*/
     /* .d3-tip:after {
@@ -111,24 +125,25 @@ body {
   } */
 
   /* Style northward tooltips specifically */
-   .d3-tip.n:after {
+   /* .d3-tip.n:after {
     margin: -2px 0 0 0;
     top: 100%;
     left: 0;
-}
+} */
+
 .prop_text{
-	fill: black;
-	stroke: #F5F5F5;
-	stroke-width: .3px;
-	font-size: 26px;
-	opacity: .9;
+	stroke: white;
+	/* fill: #F5F5F5; */
+  fill: black;
+	stroke-width: 1.15px;
+	font-size: 57px;
 	font-family: 'Open Sans','droid_sansregular', sans-serif;
 }
 
 </style>
 </head>
 <body>
-	<div id = 'title'>US Same-sex Marriage Laws<br /><small><small>1995-2015</small></small></div>
+	<div id = 'title'>Legal Status of Same-sex Marriage<br /><span id='smaller'>USA | 1995-2015</span></div>
 	<div id = 'year_svg'></div>
 	<div id = 'circles_svg'></div>
 	<div id = 'map_svg'></div>
@@ -147,7 +162,7 @@ function unique(array) {
 var margin = {top: 70, right:100, bottom: 20, left: 100};
 
 var circles_width = 700;
-var circles_height = 150;
+var circles_height = 155;
 
 var circles_svg = d3.select('#circles_svg')
   .append('svg')
@@ -173,7 +188,7 @@ var circles = circles_svg.selectAll("prop_circles")
 	.append("circle")
 		.attr('class', 'prop_circles')
 		.attr('cx', function(d) { return circles_axis(d.lpos);})
-		.attr('cy', 20)
+		.attr('cy', 23)
 		.attr('r', function(d) {return circles_size(d.X1995);})
 		.attr("fill", function(d){return pal(d.status)});
 
@@ -181,8 +196,9 @@ var circle_text = circles_svg.selectAll("prop_text")
 	.data(shares).enter()
 	.append("text")
 		.attr('class', 'prop_text')
-		.attr("x", function(d) { return circles_axis(d.lpos) + 3;})
-		.attr("y", 27)
+		.attr("x", function(d) { return circles_axis(d.lpos) + 7;})
+		.attr("y", 36)
+    .attr('opacity', .7)
 		.attr('text-anchor', 'middle')
 		.text(function(d) {return '' + Math.round(d.X1995 * 100) + '%';});
 
@@ -192,10 +208,10 @@ d3.select('#csvg').append('g')
 	.data(['No Law', 'Statutory Ban', 'Constitutional Ban', 'Legal']).enter()
 	.append('text')
 		.attr('class', 'legend_text')
-		.attr("x", function(d,i) {return circles_axis(i+1) - 4;})
-		.attr("y", 11.5)
-		.attr('font-size', 13.5)
-		.attr('font-weight', 'bold')
+		.attr("x", function(d,i) {return circles_axis(i+1) - 2;})
+		.attr("y", 13)
+		.attr('font-size', 18)
+		// .attr('font-weight', 'bold')
 		.attr('fill', 'black')
 		.attr('text-anchor', 'middle')
 		.text(function(d) {return d;});
@@ -206,10 +222,10 @@ d3.select('#csvg').append('g')
 	.data(['No Law', 'Statutory Ban', 'Constitutional Ban', 'Legal']).enter()
 	.append('rect')
 		.attr('class', 'legend_rect')
-		.attr("x", function(d,i) {return circles_axis(i+1) - 62;})
-		.attr("y", 5)
-		.attr("width", 120)
-		.attr('height', 6)
+		.attr("x", function(d,i) {return circles_axis(i+1) - 79;})
+		.attr("y", 6)
+		.attr("width", 156)
+		.attr('height', 9.2)
 		.attr('fill', function(d) {return pal(d)});
 
 
@@ -321,17 +337,17 @@ d3.csv("ssm.csv", function(data) {
       }
     }
 
-		var tool_tip = d3.tip()
-			.attr("class", "d3-tip")
-			.offset([50, -480])
-			.html(function(d,i) { return d; });
+		// var tool_tip = d3.tip()
+		// 	.attr("class", "d3-tip")
+		// 	.offset([50, -480])
+		// 	.html(function(d,i) { return d; });
+    //
+		// svg.call(tool_tip);
 
-		svg.call(tool_tip);
-
-    var trans_timer = 1250;
-    var trans_ease = d3.easeSin;
-		var text_opac = .65;
-		var text_opac2 = .9;
+    var trans_timer = 875;
+    var trans_ease = d3.easeLinear;
+		var text_opac = .8;
+		var text_opac2 = .7;
 
     // Bind the data to the SVG and create one path per GeoJSON feature
     var state_paths = svg.selectAll("path")
@@ -342,16 +358,12 @@ d3.csv("ssm.csv", function(data) {
       .attr("class","state_paths")
       .style("stroke", "#fff")
       .style("stroke-width", "1")
-			.style("fill", function(d) { return pal(d.properties.X1995)})
-			.on('mouseover', function(d,i) {
-				tool_tip.show(d.properties.abbrev);})
-			.on('mouseout', function(d,i) {
-				tool_tip.hide(d.properties.abbrev);});
+			.style("fill", function(d) { return pal(d.properties.X1995)});
 
 		year_svg.append("text")
 			.attr("id", "year_header")
 			.attr("x", 100)
-			.attr("y", 30)
+			.attr("y", 32)
 			.attr('text-anchor', 'middle')
 			.text("1995");
 
@@ -359,7 +371,7 @@ d3.csv("ssm.csv", function(data) {
 			state_paths.transition()
           .duration(trans_timer)
           .ease(trans_ease)
-					.delay(3000)
+					.delay(2000)
           .style("fill", function(d) { return pal(d.properties.X1996)})
           .transition()
           .duration(trans_timer)
@@ -440,13 +452,13 @@ d3.csv("ssm.csv", function(data) {
 					.transition()
 					.ease(trans_ease)
 					.duration(trans_timer)
-					.delay(3000)
+					.delay(2000)
 					.style("fill", function(d) { return pal(d.properties.X1995)});
 
 					circles.transition()
 						.ease(trans_ease)
 	          .duration(trans_timer)
-						.delay(3000)
+						.delay(2000)
 	          .attr('r', function(d) {return circles_size(d.X1996);})
 						.transition()
 						.ease(trans_ease)
@@ -527,18 +539,18 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer)
-						.delay(3000)
+						.delay(2000)
 						.attr('r', function(d) {return circles_size(d.X1995);});
 
 					circle_text.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.delay(3000)
+						.delay(2000)
 						.style("opacity", text_opac2)
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X1996 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -547,7 +559,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X1997 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -556,7 +568,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X1998 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -565,7 +577,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X1999 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -574,7 +586,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X2000 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -583,7 +595,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X2001 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -592,7 +604,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X2002 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -601,7 +613,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X2003 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -610,7 +622,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X2004 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -619,7 +631,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X2005 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -628,7 +640,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X2006 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -637,7 +649,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X2007 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -646,7 +658,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X2008 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -655,7 +667,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X2009 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -664,7 +676,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X2010 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -673,7 +685,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X2011 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -682,7 +694,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X2012 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -691,7 +703,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X2013 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -700,7 +712,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X2014 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
@@ -709,17 +721,17 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X2015 * 100) + '%';})
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.delay(3000)
+						.delay(2000)
 						.style("opacity", text_opac2)
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.style("opacity", .9)
+						.style("opacity", .7)
 						.text(function(d) {return '' + Math.round(d.X1995 * 100) + '%';});
 
 
@@ -727,7 +739,7 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 	          .ease(trans_ease)
 	          .duration(trans_timer/2)
-						.delay(3000)
+						.delay(2000)
 						.style("opacity", text_opac)
 						.transition()
 						.ease(trans_ease)
@@ -908,14 +920,14 @@ d3.csv("ssm.csv", function(data) {
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
-						.delay(3000)
+						.delay(2000)
 						.style("opacity", text_opac)
 						.transition()
 						.ease(trans_ease)
 						.duration(trans_timer/2)
 						.style("opacity", 1)
 						.text("1995")
-						// .on("end", repeat);
+						.on("end", repeat);
 				};
 				repeat();
 
