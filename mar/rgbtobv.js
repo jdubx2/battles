@@ -214,12 +214,30 @@ console.log(elements);
 
 appendElements(elements);
 
+var arr1 = [0.442,0.484,0.031,0.66,1.22,0.49,1.439,0.687,1.005,1.029,1.068,0.524,0.499,0.355,1.565,1.128,1.5,0.952,1.571,0.437,0.965,0.469,0.486,0.644,0.56,0.906,0.955,0.833,0.716,0.41,1.301,1.072,0.595,1.011,0.974,1.166,0.62,0.542,0.964,0.139,1.014,0.456,0.251,1.031,0.345,0.476,0.539,0.293,0.371,1.077,1.603,1.042,1.156,0.7,0.594,0.409,0.524,0.526,1.032,0.356,1.104,-0.053,0.411,0.437,1.12,0.423,0.511,0.578,0.508,0.473,1.042,0.528,1.528,0.503,0.471,1.487,0.491,0.144,1.037,0.563,0.077,0.574,1.165,0.674]
 
+// for(x in arr1){
+//   console.log(rgbToHex(bvToRgb(arr1[x])));
+// }
+
+// $.getJSON( "data/cl.json", function(data) {
+//   // var items = [];
+//   // $.each( data, function( key, val ) {
+//   //   items.push(val);
+//   // });
+//  console.log(data);
+// });
+
+var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gradient));
+var dlAnchorElem = document.getElementById('downloadAnchorElem');
+dlAnchorElem.setAttribute("href",     dataStr     );
+dlAnchorElem.setAttribute("download", "gradient.json");
+dlAnchorElem.click();
 // listen for click on the button to convert a value
-document.getElementById('convert').addEventListener('click', function(e) {
-  e.preventDefault();
-
-  let input = document.getElementById('input').value;
-
-  document.getElementsByClassName('output')[0].innerHTML = rgbToHex(bvToRgb(input));
-});
+// document.getElementById('convert').addEventListener('click', function(e) {
+//   e.preventDefault();
+//
+//   let input = document.getElementById('input').value;
+//
+//   document.getElementsByClassName('output')[0].innerHTML = rgbToHex(bvToRgb(input));
+// });
