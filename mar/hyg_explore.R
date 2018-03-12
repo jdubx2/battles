@@ -52,7 +52,7 @@ df3 %>%
     ggplot(aes(x=x2, y = y2, color = hex)) + 
       geom_point(aes(alpha = lum, size = sz)) +
       scale_color_manual(values = col) +
-      scale_size_continuous(range = c(.01,1))+
+      scale_size_continuous(range = c(.005,1.03))+
       scale_alpha_continuous(range = c(.085,1)) +
       coord_flip()+
       guides(color = F) +
@@ -60,12 +60,15 @@ df3 %>%
             panel.background = element_rect(fill = 'gray3', color ='gray3'),
             panel.grid = element_blank(),
             strip.background = element_rect(color = 'gray3', fill = 'gray3'),
-            strip.text = element_text(color = 'gray90', family = 'Consolas', size = 22),
+            strip.text = element_text(color = 'gray90', family = 'Consolas', size = 23),
             axis.text = element_blank(),
             axis.ticks = element_blank(),
-            axis.title = element_blank()) +
+            axis.title = element_blank(),
+            plot.title = element_text(size = 30, family = 'Consolas', color = 'gray90', hjust = .5),
+            plot.subtitle = element_text(size = 20, family = 'Consolas', color = 'gray90', hjust = .5)) +
       facet_wrap(~spect2) +
-    guides(size = F, alpha = F)
+    guides(size = F, alpha = F)+
+    labs(title = 'Stars by Spectral Class', subtitle = '100k+ Stars from the HYG Database')
   
   
   
