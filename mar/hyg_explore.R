@@ -1,43 +1,79 @@
 
 library(dplyr)
 library(ggplot2)
+library(jsonlite)
+library(stringr)
+library(extrafont)
 
 setwd("~/Repos/battles/mar")
 
 df <- read.csv('data/hygdata_v3.csv', stringsAsFactors = F)
 
-df2 <- df %>% select(id, proper, dist, rv, mag,absmag,spect,ci,con)
-
-df2 %>% filter(con != '', dist < 100000, mag >=7) %>% 
-  group_by(con) %>% mutate(avg_dist = mean(dist)) %>% 
-  arrange(desc(avg_dist)) %>% mutate(rownum = row_number()) %>% 
-  ggplot(aes(x=reorder(con,rownum), y = dist)) + geom_jitter(size = .5, alpha = .7) +
-  coord_flip()
-
-ci_vec <- df2 %>% filter(con != '', dist < 100000, mag >=7, !(is.na(ci))) %>% select(ci)
-
-
-library(jsonlite)
-
-# write(toJSON(ci_vec), 'data/ci.json')
-
 grad <- as.data.frame(jsonlite::fromJSON('data/gradient.json'))
 
-df3 <- df2 %>% 
-  filter(con != '', dist < 100000, mag >=7, !(is.na(ci))) %>% rowwise() %>% 
-  mutate(hex = grad$hex[which.min(abs(grad$bv - ci))])
+install.packages("NISTunits", dependencies = TRUE)
+library(NISTunits)
 
+NISTdegTOradian(180)
+NISTradianTOdeg(pi)
+#-------------------#
+spect_vec <- c('O','B','A','F','G','K','M')
+
+df2 <- df %>% select(id, proper, dist, rv, mag, absmag,spect,ci,con,lum,x,y, ra, dec)
+
+df3 <- df2 %>% 
+  mutate(spect1 = toupper(str_sub(spect,1,1))) %>% 
+  mutate(x2 = 1 * cos(NISTdegTOradian(dec)) * cos(NISTdegTOradian(ra*15)),
+         y2 = 1 * cos(NISTdegTOradian(dec)) * sin(NISTdegTOradian(ra*15)),
+         z2 = dist * sin(NISTdegTOradian(dec))) %>% 
+  filter(dist < 100000, !(is.na(ci)), spect1 %in% spect_vec) %>% rowwise() %>% 
+  mutate(hex = grad$hex[which.min(abs(grad$bv - ci))])
 
 col <- as.character(df3$hex)
 names(col) <- as.character(df3$hex)
 
-  df3 %>% group_by(con) %>% mutate(avg_dist = mean(dist)) %>% 
-  arrange(desc(avg_dist)) %>% mutate(rownum = row_number()) %>% 
-  ggplot(aes(x=reorder(con,rownum), y = dist, color = hex)) + 
-    geom_jitter(size = .85, alpha = .25) +
-    scale_color_manual(values = col) +
-    coord_flip()+
-    guides(color = F) +
-    theme(plot.background = element_rect(fill = 'gray3', color ='gray3'),
-          panel.background = element_rect(fill = 'gray3', color ='gray3'),
-          panel.grid = element_blank())
+# top_con <- df3 %>% group_by(con) %>% 
+#   summarise(n = n()) %>% arrange(desc(n)) %>% 
+#   slice(1:12)
+  
+df3 %>% 
+  group_by(spect1) %>% 
+  summarise(avg_mag = mean(mag),
+            avg_absmag = mean(absmag),
+            avg_lum = mean(lum))
+  
+  df3 %>% 
+    mutate(lum = ifelse(lum > 5000,5000,lum),
+           sz = ifelse(lum > 1500, 1500,lum)) %>% 
+    mutate(spect2 = ifelse(spect1 %in% c('O','B'), 'O/B', spect1),
+           spect2 = paste0('Class ', spect2),
+           spect2 = factor(spect2, 
+                           levels = c('Class O/B', 'Class A', 'Class F', 'Class G', 'Class K', 'Class M'))) %>% 
+    ggplot(aes(x=x2, y = y2, color = hex)) + 
+      geom_point(aes(alpha = lum, size = sz)) +
+      scale_color_manual(values = col) +
+      scale_size_continuous(range = c(.01,1))+
+      scale_alpha_continuous(range = c(.085,1)) +
+      coord_flip()+
+      guides(color = F) +
+      theme(plot.background = element_rect(fill = 'gray3', color ='gray3'),
+            panel.background = element_rect(fill = 'gray3', color ='gray3'),
+            panel.grid = element_blank(),
+            strip.background = element_rect(color = 'gray3', fill = 'gray3'),
+            strip.text = element_text(color = 'gray90', family = 'Consolas', size = 22),
+            axis.text = element_blank(),
+            axis.ticks = element_blank(),
+            axis.title = element_blank()) +
+      facet_wrap(~spect2) +
+    guides(size = F, alpha = F)
+  
+  
+  
+  df4 <- df3 %>% filter(con =='Psc') %>% 
+    mutate(x2 = .1 * cos(NISTdegTOradian(dec)) * cos(NISTdegTOradian(ra*15)),
+           y2 = .1 * cos(NISTdegTOradian(dec)) * sin(NISTdegTOradian(ra*15)),
+           z2 = .1 * sin(NISTdegTOradian(dec)))
+  
+  library(scatterplot3d)
+  
+  scatterplot3d(df4$x2, df4$y2, df4$z2, angle = -170)
