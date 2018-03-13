@@ -40,27 +40,29 @@ df3 %>%
   group_by(spect1) %>% 
   summarise(avg_mag = mean(mag),
             avg_absmag = mean(absmag),
-            avg_lum = mean(lum))
+            avg_lum = mean(lum),
+            avg_ci = mean(ci))
   
   p0 <- df3 %>% 
-    mutate(lum = ifelse(lum > 5000,5000,lum),
+    mutate(lum = ifelse(lum > 3500,3500,lum),
            sz = ifelse(lum > 1700, 1700,lum)) %>% 
     mutate(spect2 = ifelse(spect1 %in% c('O','B'), 'O/B', spect1),
            spect2 = paste0('Class ', spect2),
            spect2 = factor(spect2, 
-                           levels = c('Class O/B', 'Class A', 'Class F', 'Class G', 'Class K', 'Class M'))) %>% 
+                           levels = rev(c('Class O/B', 'Class A', 'Class F', 'Class G', 'Class K', 'Class M')))) %>% 
     ggplot(aes(x=x2, y = y2, color = hex)) + 
       geom_point(aes(alpha = lum, size = sz)) +
       scale_color_manual(values = col) +
       scale_size_continuous(range = c(.005,.99))+
-      scale_alpha_continuous(range = c(.08,1)) +
+      scale_alpha_continuous(range = c(.075,1)) +
       coord_flip()+
       guides(color = F) +
       theme(plot.background = element_rect(fill = 'gray3', color ='gray3'),
             panel.background = element_rect(fill = 'gray3', color ='gray3'),
             panel.grid = element_blank(),
             strip.background = element_rect(color = 'gray3', fill = 'gray3'),
-            strip.text = element_text(color = 'gray90', family = 'Consolas', size = 19),
+            # strip.text = element_text(color = 'gray90', family = 'Consolas', size = 19),
+            strip.text = element_blank(),
             axis.text = element_blank(),
             axis.ticks = element_blank(),
             axis.title = element_blank(),
@@ -68,20 +70,24 @@ df3 %>%
             plot.subtitle = element_text(size = 19, family = 'Consolas', color = 'gray90', hjust = .5),
             plot.margin = margin(1,1,4.5,1,unit = 'cm')) +
       facet_wrap(~spect2, nrow=1) +
-    guides(size = F, alpha = F)+
-    labs(title = 'Spectral Classification of Stars')
+    guides(size = F, alpha = F)
+    # labs(title = 'Spectral Classification of Stars')
   
-  ggsave(file="stars.png", plot=p0, width=14.8, height=5.3, bg = 'transparent')
+  ggsave(file="stars.png", plot=p0, width=15.8, height=4.7, bg = 'transparent')
   
 temps_df <- data.frame(class = factor(c('O', 'B', 'A', 'F', 'G', 'K', 'M'), ordered = T),
                        temp = rev(c(3500,5000,6000,7500,11000,25000,40000)),
                        share = c(.0003,.13, .6,3,7.6, 12.1,76.45),
                        hex = c("#bdf0ff", "#ddf2ff","#fff0ff","#ffebd1","#ffe49b","#ffcf49","#ffbe28"))
+
+#for d3 arc calc
+
+temps_df %>% arrange(desc(share)) %>% mutate(share = temp/sum(temp),
+                    cum = cumsum(share),
+                    d3 = round(.85*cum,3))
   
 col2 <- as.character(temps_df$hex)
 names(col2) <- as.character(temps_df$hex)
-
-
 
 library(cowplot)
 
